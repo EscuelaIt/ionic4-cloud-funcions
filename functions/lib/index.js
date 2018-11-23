@@ -13,10 +13,11 @@ const admin = require("firebase-admin");
 admin.initializeApp(Object.assign({}, functions.config().firebase, { timestampsInSnapshots: true }));
 exports.sendToUser = functions.https.onRequest((request, response) => __awaiter(this, void 0, void 0, function* () {
     const userId = request.body.userId;
+    const message = request.body.message;
     const payload = {
         notification: {
-            title: 'News',
-            body: `Fantito there are news for you`,
+            title: 'Hola',
+            body: message,
             sound: 'default',
         }
     };
@@ -28,7 +29,9 @@ exports.sendToUser = functions.https.onRequest((request, response) => __awaiter(
         const token = result.data().token;
         tokens.push(token);
     });
-    yield admin.messaging().sendToDevice(tokens, payload);
+    if (tokens.length > 0) {
+        yield admin.messaging().sendToDevice(tokens, payload);
+    }
     response.send({ rta: true });
 }));
 //# sourceMappingURL=index.js.map

@@ -5,13 +5,13 @@ admin.initializeApp({
   timestampsInSnapshots: true
 });
 
-
 export const sendToUser = functions.https.onRequest(async (request, response) => {
   const userId = request.body.userId;
+  const message = request.body.message;
   const payload: admin.messaging.MessagingPayload = {
     notification: {
-      title: 'News',
-      body: `Fantito there are news for you`,
+      title: 'Hola',
+      body: message,
       sound: 'default',
     }
   }
@@ -19,10 +19,12 @@ export const sendToUser = functions.https.onRequest(async (request, response) =>
   const devicesRef = db.collection('devices').where('userId', '==', userId);
   const devices = await devicesRef.get();
   const tokens = [];
-    devices.forEach(result => {
+  devices.forEach(result => {
     const token = result.data().token;
     tokens.push( token );
-  })
-  await admin.messaging().sendToDevice(tokens, payload);
+  });
+  if (tokens.length > 0) {
+    await admin.messaging().sendToDevice(tokens, payload);
+  }
   response.send({rta: true});
 });
